@@ -8,7 +8,7 @@ use Faker\Generator as Faker;
 
 $factory->define(Category::class, function (Faker $faker) {
     return [
-        'name'  => $faker->sentence($nbWords = 3, $variableNbWords = true),
-        'slug'  => Str::slug($faker->sentence($nbWords = 6, $variableNbWords = true)),
+        'name'  => $faker->sentence(2, true),
+        'slug'  => Str::slug($faker->sentence(2, true)),
     ];
 });

@@ -29,7 +29,7 @@
                         <h4>Posts</h4>
                     </div>
                     <div class="card-body">
-                        50
+                        {{ DB::table('posts')->count() }}
                     </div>
                 </div>
             </div>

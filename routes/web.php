@@ -19,3 +19,4 @@ Route::get('/', function () {
 
 Route::view('dashboard', 'dashboard')->name('dashboard');
 Route::resource('categories', 'CategoryController');
+Route::resource('posts', 'PostController');
