@@ -61,9 +61,7 @@
                         <td>{{ $result->slug }}</td>
                         <td>{{ $result->short_description }}</td>
                         <td>{{ $result->content }}</td>
-                        <td>
-                            <span class="badge badge-warning">{{ $result->category->name }}</span>
-                        </td>
+                        <td>{{ $result->category->name }}</td>
                         <td><img src="{{ asset('storage/thumbnails/'.$result->thumbnail) }}" class="img-fluid" alt="thumbnail"></td>
                         <td>
                             <a href="{{ route('posts.edit', $result->id) }}" type="button" class="btn btn-sm btn-info"><i class="fas fa-pen"></i></a>

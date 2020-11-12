@@ -31,11 +31,11 @@
             <input type="password" class="form-control" name="current_password" autofocus>
         </div>
         <div class="form-group">
-            <label for="">New Password</label>
+            <label for="password">New Password</label>
             <input type="password" class="form-control" name="password">
         </div>
         <div class="form-group">
-            <label for="">New Password Confirmation</label>
+            <label for="password_confirmation">New Password Confirmation</label>
             <input type="password" class="form-control" name="password_confirmation">
         </div>
         <div class="form-group">

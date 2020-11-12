@@ -13,18 +13,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'BlogController@index');
+Route::get('post/{slug}','BlogController@detail')->name('blog.detail');
+Route::get('categories/{category}','BlogController@categories')->name('blog.categories');
+Route::get('search','BlogController@search')->name('blog.search');
 
 Auth::routes();
 
 Route::group(['middleware' => 'auth'], function () {
-    Route::get('/home', 'HomeController@index')->name('home');
-    Route::view('dashboard', 'dashboard')->name('dashboard');
-    Route::resource('categories', 'CategoryController');
-    Route::resource('posts', 'PostController');
+    Route::prefix('cms')->group(function () {
+        Route::view('dashboard', 'dashboard')->name('dashboard');
+        Route::resource('categories', 'CategoryController');
+        Route::resource('posts', 'PostController');
 
-    Route::get('password', 'PasswordController@changePassword')->name('change.password');
-    Route::patch('password', 'PasswordController@updatePassword')->name('update.password');
+        Route::get('password', 'PasswordController@changePassword')->name('change.password');
+        Route::patch('password', 'PasswordController@updatePassword')->name('update.password');
+    });
 });
