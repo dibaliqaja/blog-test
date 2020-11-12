@@ -14,9 +14,17 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('dashboard');
+    return view('welcome');
 });
 
-Route::view('dashboard', 'dashboard')->name('dashboard');
-Route::resource('categories', 'CategoryController');
-Route::resource('posts', 'PostController');
+Auth::routes();
+
+Route::group(['middleware' => 'auth'], function () {
+    Route::get('/home', 'HomeController@index')->name('home');
+    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::resource('categories', 'CategoryController');
+    Route::resource('posts', 'PostController');
+
+    Route::get('password', 'PasswordController@changePassword')->name('change.password');
+    Route::patch('password', 'PasswordController@updatePassword')->name('update.password');
+});
