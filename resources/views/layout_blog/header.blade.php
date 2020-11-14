@@ -8,6 +8,8 @@
 
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
 
+    <link rel="stylesheet" href="{{ asset('assets/modules/fontawesome/css/all.min.css') }}">
+
     <link rel="stylesheet" href="{{ asset('front/css/open-iconic-bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ asset('front/css/animate.css') }}">
 
@@ -36,7 +38,7 @@
 
             <div class="collapse navbar-collapse" id="ftco-nav">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item active"><a href="/" class="nav-link">Home</a></li>
+                    <li class="nav-item {{ (request()->routeIs('homepage')) ? 'active' : '' }}"><a href="{{ route('homepage') }}" class="nav-link">Home</a></li>
                     @if (Auth::user())
                         <li class="nav-item"><a href="{{ route('dashboard') }}" class="nav-link">Dashboard</a></li>
                         <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
@@ -48,8 +50,8 @@
                             {{ __('Logout') }}
                         </a></li>
                     @else
-                        <li class="nav-item"><a href="/login" class="nav-link">Login</a></li>
-                        <li class="nav-item"><a href="/register" class="nav-link">Register</a></li>
+                        <li class="nav-item {{ (request()->routeIs('login')) ? 'active' : '' }}"><a href="/login#login-card" class="nav-link">Login</a></li>
+                        <li class="nav-item {{ (request()->routeIs('register')) ? 'active' : '' }}"><a href="/register#register-card" class="nav-link">Register</a></li>
                     @endif
                 </ul>
             </div>

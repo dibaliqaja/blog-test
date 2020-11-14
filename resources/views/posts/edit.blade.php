@@ -26,7 +26,7 @@
         </div>
         <div class="form-group">
             <label for="content">Content</label>
-            <textarea name="content" class="form-control" cols="30" rows="10">{{ old('content', $post->content) }}</textarea>
+            <textarea name="content" class="form-control" id="content">{{ old('content', $post->content) }}</textarea>
         </div>
         <div class="form-group">
             <label for="category_id">Category</label>
@@ -53,4 +53,12 @@
         </div>
     </form>
 
+@endsection
+
+
+@section('script')
+    <script src="https://cdn.ckeditor.com/4.13.1/standard/ckeditor.js"></script>
+    <script>
+        CKEDITOR.replace('content');
+    </script>
 @endsection

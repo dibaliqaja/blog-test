@@ -22,7 +22,12 @@ class CreatePostsTable extends Migration
             $table->string('image');
             $table->string('thumbnail');
             $table->unsignedBigInteger('category_id');
+            $table->unsignedBigInteger('users_id');
             $table->timestamps();
+
+            $table->foreign('users_id')
+                ->references('id')
+                ->on('users');
 
             $table->foreign('category_id')
                 ->references('id')

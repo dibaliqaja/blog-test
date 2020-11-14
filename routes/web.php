@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', 'BlogController@index');
+Route::get('/', 'BlogController@index')->name('homepage');
 Route::get('post/{slug}','BlogController@detail')->name('blog.detail');
 Route::get('categories/{category}','BlogController@categories')->name('blog.categories');
 Route::get('search','BlogController@search')->name('blog.search');
@@ -30,3 +30,6 @@ Route::group(['middleware' => 'auth'], function () {
         Route::patch('password', 'PasswordController@updatePassword')->name('update.password');
     });
 });
+
+Route::get('/login/{provider}', 'Auth\LoginController@redirectToProvider')->name('social.login');
+Route::get('/login/{provider}/callback', 'Auth\LoginController@handleProviderCallback')->name('social.callback');

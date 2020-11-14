@@ -14,10 +14,16 @@ class Post extends Model
         'image',
         'thumbnail',
         'category_id',
+        'users_id'
     ];
 
     public function category()
     {
         return $this->belongsTo('App\Category');
+    }
+
+    public function users()
+    {
+        return $this->belongsTo('App\User');
     }
 }

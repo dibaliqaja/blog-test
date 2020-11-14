@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CategoryController extends Controller
 {
@@ -17,7 +18,7 @@ class CategoryController extends Controller
     {
         $this->middleware('auth');
     }
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -25,13 +26,16 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $categories = Category::latest()->paginate(10);
+        $categories = Category::where('users_id', auth()->id())->latest()->paginate(10);
+        $user = Auth::user()->id;
         $keyword  = $request->get('keyword');
         if ($keyword) {
-            $categories = Category::where('name', 'LIKE', "%$keyword%")->paginate(10);
+            $categories = Category::where('name', 'LIKE', "%$keyword%")
+                ->where('users_id', auth()->id())
+                ->paginate(10);
         }
 
-        return view('categories.index', compact('categories'));
+        return view('categories.index', compact('categories', 'user'));
     }
 
     /**
@@ -59,6 +63,7 @@ class CategoryController extends Controller
         Category::create([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
+            'users_id' => Auth::id(),
         ]);
 
         return redirect()->route('categories.index')->with('success', 'Category added successfully.');
@@ -92,6 +97,7 @@ class CategoryController extends Controller
         $category_data = [
             'name' => $request->name,
             'slug' => Str::slug($request->name),
+            'users_id' => Auth::id(),
         ];
 
         Category::whereId($category->id)->update($category_data);

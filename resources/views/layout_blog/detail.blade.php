@@ -23,7 +23,7 @@
                 <div class="col-lg-8 ftco-animate">
 
                         <p class="mb-5">
-                            <img src="{{ asset('storage/images/'.$detail->image) }}" alt="" class="img-fluid">
+                            <img src="{{ asset('storage/images/'.$detail->image) }}" class="img-fluid" style="width: 770px">
                         </p>
                         <h2 class="mb-3"></h2>
 
@@ -37,7 +37,7 @@
 
                         <div class="about-author d-flex p-4 bg-light">
                             <div class="desc">
-                              {{-- <h3>Posted By {{ $detail->users->name }}</h3> --}}
+                              <h3>Posted By {{ $detail->users->name }}</h3>
                               <h6>{{ $detail->created_at->diffForHumans() }}</h6>
                             </div>
                           </div>

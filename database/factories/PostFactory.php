@@ -17,5 +17,8 @@ $factory->define(Post::class, function (Faker $faker) {
         'category_id' => function () {
             return factory(App\Category::class)->create()->id;
         },
+        'users_id' => function () {
+            return factory(App\User::class)->create()->id;
+        },
     ];
 });

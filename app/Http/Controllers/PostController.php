@@ -8,6 +8,7 @@ use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
@@ -20,7 +21,7 @@ class PostController extends Controller
     {
         $this->middleware('auth');
     }
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -28,13 +29,16 @@ class PostController extends Controller
      */
     public function index(Request $request)
     {
-        $posts = Post::latest()->paginate(10);
+        $posts = Post::where('users_id', auth()->id())->latest()->paginate(10);
+        $user = Auth::user()->id;
         $keyword  = $request->get('keyword');
         if ($keyword) {
-            $posts = Post::where('title', 'LIKE', "%$keyword%")->paginate(10);
+            $posts = Post::where('title', 'LIKE', "%$keyword%")
+                ->where('users_id', auth()->id())
+                ->paginate(10);
         }
 
-        return view('posts.index', compact('posts'));
+        return view('posts.index', compact('posts', 'user'));
     }
 
     /**
@@ -44,7 +48,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        $categories = Category::all();
+        $categories = Category::all()->where('users_id', auth()->id());
         return view('posts.create', compact('categories'));
     }
 
@@ -79,6 +83,7 @@ class PostController extends Controller
                 'image'             => $new_image,
                 'thumbnail'         => $new_thumbnail->basename,
                 'category_id'       => $request->category_id,
+                'users_id'           => Auth::id(),
             ]);
 
         } else {
@@ -88,6 +93,7 @@ class PostController extends Controller
                 'short_description' => $request->short_description,
                 'content'           => $request->content,
                 'category_id'       => $request->category_id,
+                'users_id'           => Auth::id(),
             ]);
         }
 
@@ -102,7 +108,7 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        $categories = Category::all();
+        $categories = Category::all()->where('users_id', auth()->id());
         return view('posts.edit', compact('post', 'categories'));
     }
 
@@ -138,6 +144,7 @@ class PostController extends Controller
                 'image'             => $new_image,
                 'thumbnail'         => $new_thumbnail->basename,
                 'category_id'       => $request->category_id,
+                'users_id'           => Auth::id(),
             ]);
         } else {
             $post->update([
@@ -146,6 +153,7 @@ class PostController extends Controller
                 'short_description' => $request->short_description,
                 'content'           => $request->content,
                 'category_id'       => $request->category_id,
+                'users_id'           => Auth::id(),
             ]);
         }
 

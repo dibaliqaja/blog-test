@@ -1,10 +1,10 @@
 <div class="main-sidebar sidebar-style-2">
     <aside id="sidebar-wrapper">
         <div class="sidebar-brand">
-            <a href="/">BLOGTEST</a>
+            <a href="{{ route('homepage') }}">BLOGTEST</a>
         </div>
         <div class="sidebar-brand sidebar-brand-sm">
-            <a href="/">BT</a>
+            <a href="{{ route('homepage') }}">BT</a>
         </div>
         <ul class="sidebar-menu">
             <li class="menu-header">Dashboard</li>

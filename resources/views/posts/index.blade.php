@@ -60,7 +60,7 @@
                         <td>{{ $result->title }}</td>
                         <td>{{ $result->slug }}</td>
                         <td>{{ $result->short_description }}</td>
-                        <td>{{ $result->content }}</td>
+                        <td>{!! $result->content !!}</td>
                         <td>{{ $result->category->name }}</td>
                         <td><img src="{{ asset('storage/thumbnails/'.$result->thumbnail) }}" class="img-fluid" alt="thumbnail"></td>
                         <td>

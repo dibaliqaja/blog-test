@@ -14,7 +14,7 @@
                         <h4>Categories</h4>
                     </div>
                     <div class="card-body">
-                        {{ DB::table('categories')->count() }}
+                        {{ DB::table('categories')->where('users_id', auth()->id())->count() }}
                     </div>
                 </div>
             </div>
@@ -29,7 +29,7 @@
                         <h4>Posts</h4>
                     </div>
                     <div class="card-body">
-                        {{ DB::table('posts')->count() }}
+                        {{ DB::table('posts')->where('users_id', auth()->id())->count() }}
                     </div>
                 </div>
             </div>
