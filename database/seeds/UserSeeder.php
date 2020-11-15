@@ -16,17 +16,15 @@ class UserSeeder extends Seeder
     {
         factory(User::class, 5)->create();
 
-        DB::table('users')->insert(
-            [
-                'name' => 'Administrator',
-                'email' => 'admin@blogtest.com',
-                'email_verified_at' => now(),
-                'password' => bcrypt('admin123'),
-                'remember_token' => Str::random(10),
-                'role' => json_encode(["ADMIN"]),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]
-        );
+        DB::table('users')->insert([
+            'name' => 'Administrator',
+            'email' => 'admin@blogtest.com',
+            'email_verified_at' => now(),
+            'password' => bcrypt('admin123'),
+            'remember_token' => Str::random(10),
+            'role' => json_encode(["ADMIN"]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }

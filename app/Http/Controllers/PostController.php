@@ -33,8 +33,8 @@ class PostController extends Controller
         if (Gate::allows('admin-access')) {
             $posts = Post::latest()->paginate(10);
             $keyword  = $request->get('keyword');
-            if ($keyword) $posts = Post::where('title', 'LIKE', "%$keyword%")->paginate(10);            
-    
+            if ($keyword) $posts = Post::where('title', 'LIKE', "%$keyword%")->paginate(10);
+
             return view('posts.index', compact('posts'));
         } else if (Gate::allows('author-access')) {
             $posts = Post::where('users_id', auth()->id())->latest()->paginate(10);
@@ -44,7 +44,7 @@ class PostController extends Controller
                     ->where('users_id', auth()->id())
                     ->paginate(10);
             }
-    
+
             return view('posts.index', compact('posts'));
         }
 
@@ -118,7 +118,7 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        if (Auth::user()->id == $post->users_id || Gate::allows('admin-access')) {            
+        if (Auth::user()->id == $post->users_id || Gate::allows('admin-access')) {
             $categories = Category::all();
             return view('posts.edit', compact('post', 'categories'));
         }
@@ -159,7 +159,6 @@ class PostController extends Controller
                     'image'             => $new_image,
                     'thumbnail'         => $new_thumbnail->basename,
                     'category_id'       => $request->category_id,
-                    'users_id'          => Auth::id(),
                 ]);
             } else {
                 $post->update([
@@ -168,7 +167,6 @@ class PostController extends Controller
                     'short_description' => $request->short_description,
                     'content'           => $request->content,
                     'category_id'       => $request->category_id,
-                    'users_id'          => Auth::id(),
                 ]);
             }
 
@@ -186,7 +184,7 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        if (Auth::user()->id == $post->users_id || Gate::allows('admin-access')) {   
+        if (Auth::user()->id == $post->users_id || Gate::allows('admin-access')) {
             $image_path     = public_path('storage/images/'.$post->image);
             $thumbnail_path = public_path('storage/thumbnails/'.$post->thumbnail);
             if(File::exists($image_path, $thumbnail_path)) File::delete($image_path, $thumbnail_path);
