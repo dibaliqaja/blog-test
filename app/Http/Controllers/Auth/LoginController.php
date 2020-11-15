@@ -98,12 +98,13 @@ class LoginController extends Controller
     public function createUserWithSocialData(string $provider, object $data)
     {
         try {
-            $user = new User;
-            $user->name = $data->name;
-            $user->email = $data->email;
-            $user->social = [
+            $user           = new User;
+            $user->name     = $data->name;
+            $user->email    = $data->email;
+            $user->role     = json_encode(["AUTHOR"]);
+            $user->social   = [
                 $provider => [
-                    'id' => $data->id,
+                    'id'    => $data->id,
                     'token' => $data->token,
                 ],
             ];

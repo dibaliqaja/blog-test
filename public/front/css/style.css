@@ -1870,7 +1870,7 @@ textarea.form-control {
   background-color: rgba(220, 53, 69, 0.9);
   border-radius: 0.25rem; }
 
-.was-validated .form-control:invalid, .form-control.is-invalid {
+.was-validated .form-control:invalid, .form-control.is-invalid, a.is-invalid {
   border-color: #dc3545;
   padding-right: 2.25rem;
   background-repeat: no-repeat;

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 
 class PasswordController extends Controller
@@ -14,7 +15,10 @@ class PasswordController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware(function($request, $next) {
+            if (Gate::allows('author-access')) return $next($request);
+            abort(403);
+        });
     }
 
     public function changePassword(Request $request)

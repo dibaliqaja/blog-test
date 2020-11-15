@@ -91,17 +91,16 @@
                             <div class="form-group row mb-0">
                                 <div class="col-md-6 offset-md-4">
                                     @foreach(['facebook', 'google'] as $provider)
-                                        <a class="btn text-white bg-secondary mb-2" href="{{ route('social.login', ['provider' => $provider]) }}">
+                                        <a class="btn text-white bg-secondary mb-2 @error('socialize') is-invalid @enderror" href="{{ route('social.login', ['provider' => $provider]) }}">
                                             <i class="fab fa-{{ lcfirst($provider) }}"></i> &nbsp; Login with {{ ucwords($provider) }}
                                         </a>
                                     @endforeach
-                                    @if ($errors->any())
-                                        <div class="alert alert-danger">
-                                            @foreach ($errors->all() as $error)
-                                            <div>{{ $error }}</div>
-                                            @endforeach
-                                        </div>
-                                    @endif
+
+                                    @error('socialize')
+                                        <span class="invalid-feedback" role="alert">
+                                            <strong>{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
                         </form>

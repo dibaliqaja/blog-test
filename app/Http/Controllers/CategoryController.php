@@ -6,6 +6,7 @@ use App\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class CategoryController extends Controller
 {
@@ -16,7 +17,10 @@ class CategoryController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware(function($request, $next) {
+            if (Gate::allows('author-access')) return $next($request);
+            abort(403);
+        });
     }
 
     /**
@@ -26,16 +30,14 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $categories = Category::where('users_id', auth()->id())->latest()->paginate(10);
-        $user = Auth::user()->id;
+        $categories = Category::latest()->paginate(10);
         $keyword  = $request->get('keyword');
         if ($keyword) {
             $categories = Category::where('name', 'LIKE', "%$keyword%")
-                ->where('users_id', auth()->id())
                 ->paginate(10);
         }
 
-        return view('categories.index', compact('categories', 'user'));
+        return view('categories.index', compact('categories'));
     }
 
     /**
@@ -63,7 +65,6 @@ class CategoryController extends Controller
         Category::create([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
-            'users_id' => Auth::id(),
         ]);
 
         return redirect()->route('categories.index')->with('success', 'Category added successfully.');
@@ -75,8 +76,9 @@ class CategoryController extends Controller
      * @param  \App\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function edit(Category $category)
+    public function edit($id)
     {
+        $category = Category::findOrFail($id);
         return view('categories.edit', compact('category'));
     }
 
@@ -87,20 +89,19 @@ class CategoryController extends Controller
      * @param  \App\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, $id)
     {
+        $category = Category::findOrFail($id);
         $this->validate($request, [
-            'name' => 'required|unique:categories|min:5',
+            'name' => 'required|unique:categories,name,'.$id.'|min:5',
         ]);
-
 
         $category_data = [
             'name' => $request->name,
             'slug' => Str::slug($request->name),
-            'users_id' => Auth::id(),
         ];
 
-        Category::whereId($category->id)->update($category_data);
+        Category::whereId($category)->update($category_data);
 
         return redirect()->route('categories.index')->with('success','Category updated successfully.');
     }
@@ -111,9 +112,10 @@ class CategoryController extends Controller
      * @param  \App\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Category $category)
+    public function destroy($id)
     {
         try {
+            $category = Category::findOrFail($id);
             $category->delete();
 
             return redirect()->back()->with('success','Category deleted successfully.');

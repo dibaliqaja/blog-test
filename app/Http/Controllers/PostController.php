@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class PostController extends Controller
 {
@@ -29,16 +30,25 @@ class PostController extends Controller
      */
     public function index(Request $request)
     {
-        $posts = Post::where('users_id', auth()->id())->latest()->paginate(10);
-        $user = Auth::user()->id;
-        $keyword  = $request->get('keyword');
-        if ($keyword) {
-            $posts = Post::where('title', 'LIKE', "%$keyword%")
-                ->where('users_id', auth()->id())
-                ->paginate(10);
+        if (Gate::allows('admin-access')) {
+            $posts = Post::latest()->paginate(10);
+            $keyword  = $request->get('keyword');
+            if ($keyword) $posts = Post::where('title', 'LIKE', "%$keyword%")->paginate(10);            
+    
+            return view('posts.index', compact('posts'));
+        } else if (Gate::allows('author-access')) {
+            $posts = Post::where('users_id', auth()->id())->latest()->paginate(10);
+            $keyword  = $request->get('keyword');
+            if ($keyword) {
+                $posts = Post::where('title', 'LIKE', "%$keyword%")
+                    ->where('users_id', auth()->id())
+                    ->paginate(10);
+            }
+    
+            return view('posts.index', compact('posts'));
         }
 
-        return view('posts.index', compact('posts', 'user'));
+        abort(403);
     }
 
     /**
@@ -48,7 +58,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        $categories = Category::all()->where('users_id', auth()->id());
+        $categories = Category::all();
         return view('posts.create', compact('categories'));
     }
 
@@ -61,10 +71,10 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'title'             => 'required|min:5',
+            'title'             => 'required|unique:posts|min:5',
             'short_description' => 'required|min:5',
             'content'           => 'required',
-            'image'             => 'required|image|mimes:jpeg,png,jpg|max:1024',
+            'image'             => 'image|mimes:jpeg,png,jpg|max:1024',
             'category_id'       => 'required',
         ]);
 
@@ -77,23 +87,23 @@ class PostController extends Controller
 
             Post::create([
                 'title'             => $request->title,
-                'slug'              => Str::slug($request->title),
+                'slug'              => Str::slug($request->title)."-".Auth::id(),
                 'short_description' => $request->short_description,
                 'content'           => $request->content,
                 'image'             => $new_image,
                 'thumbnail'         => $new_thumbnail->basename,
                 'category_id'       => $request->category_id,
-                'users_id'           => Auth::id(),
+                'users_id'          => Auth::id(),
             ]);
 
         } else {
             Post::create([
                 'title'             => $request->title,
-                'slug'              => Str::slug($request->title),
+                'slug'              => Str::slug($request->title)."-".Auth::id(),
                 'short_description' => $request->short_description,
                 'content'           => $request->content,
                 'category_id'       => $request->category_id,
-                'users_id'           => Auth::id(),
+                'users_id'          => Auth::id(),
             ]);
         }
 
@@ -108,8 +118,12 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        $categories = Category::all()->where('users_id', auth()->id());
-        return view('posts.edit', compact('post', 'categories'));
+        if (Auth::user()->id == $post->users_id || Gate::allows('admin-access')) {            
+            $categories = Category::all();
+            return view('posts.edit', compact('post', 'categories'));
+        }
+
+        abort(401);
     }
 
     /**
@@ -121,43 +135,47 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        $this->validate($request, [
-            'title'             => 'required|min:5',
-            'short_description' => 'required|min:5',
-            'content'           => 'required',
-            'image'             => 'image|mimes:jpeg,png,jpg|max:1024',
-            'category_id'       => 'required',
-        ]);
-
-        if ($request->hasFile('image')) {
-            $image = $request->image;
-            $new_image = 'img-'.time().'.'.$image->getClientOriginalExtension();
-            $thumbnail = Image::make($image->getRealPath())->resize(250, 125);
-            $new_thumbnail = $thumbnail->save(public_path('storage/thumbnails/th-'.$new_image));
-            $image->move('storage/images/', $new_image);
-
-            $post->update([
-                'title'             => $request->title,
-                'slug'              => Str::slug($request->title),
-                'short_description' => $request->short_description,
-                'content'           => $request->content,
-                'image'             => $new_image,
-                'thumbnail'         => $new_thumbnail->basename,
-                'category_id'       => $request->category_id,
-                'users_id'           => Auth::id(),
+        if (Auth::user()->id == $post->users_id || Gate::allows('admin-access')) {
+            $this->validate($request, [
+                'title'             => 'required|unique:posts,title,'.$post->id.'|min:5',
+                'short_description' => 'required|min:5',
+                'content'           => 'required',
+                'image'             => 'image|mimes:jpeg,png,jpg|max:1024',
+                'category_id'       => 'required',
             ]);
-        } else {
-            $post->update([
-                'title'             => $request->title,
-                'slug'              => Str::slug($request->title),
-                'short_description' => $request->short_description,
-                'content'           => $request->content,
-                'category_id'       => $request->category_id,
-                'users_id'           => Auth::id(),
-            ]);
+
+            if ($request->hasFile('image')) {
+                $image = $request->image;
+                $new_image = 'img-'.time().'.'.$image->getClientOriginalExtension();
+                $thumbnail = Image::make($image->getRealPath())->resize(250, 125);
+                $new_thumbnail = $thumbnail->save(public_path('storage/thumbnails/th-'.$new_image));
+                $image->move('storage/images/', $new_image);
+
+                $post->update([
+                    'title'             => $request->title,
+                    'slug'              => Str::slug($request->title)."-".Auth::id(),
+                    'short_description' => $request->short_description,
+                    'content'           => $request->content,
+                    'image'             => $new_image,
+                    'thumbnail'         => $new_thumbnail->basename,
+                    'category_id'       => $request->category_id,
+                    'users_id'          => Auth::id(),
+                ]);
+            } else {
+                $post->update([
+                    'title'             => $request->title,
+                    'slug'              => Str::slug($request->title)."-".Auth::id(),
+                    'short_description' => $request->short_description,
+                    'content'           => $request->content,
+                    'category_id'       => $request->category_id,
+                    'users_id'          => Auth::id(),
+                ]);
+            }
+
+            return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
         }
 
-        return redirect()->route('posts.index')->with('success','Post updated successfully.');
+        abort(401);
     }
 
     /**
@@ -168,12 +186,16 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        $image_path     = public_path('storage/images/'.$post->image);
-        $thumbnail_path = public_path('storage/thumbnails/'.$post->thumbnail);
-        if(File::exists($image_path, $thumbnail_path)) File::delete($image_path, $thumbnail_path);
+        if (Auth::user()->id == $post->users_id || Gate::allows('admin-access')) {   
+            $image_path     = public_path('storage/images/'.$post->image);
+            $thumbnail_path = public_path('storage/thumbnails/'.$post->thumbnail);
+            if(File::exists($image_path, $thumbnail_path)) File::delete($image_path, $thumbnail_path);
 
-        $post->delete();
+            $post->delete();
 
-        return redirect()->back()->with('success','Post deleted successfully.');
+            return redirect()->back()->with('success','Post deleted successfully.');
+        }
+
+        abort(401);
     }
 }

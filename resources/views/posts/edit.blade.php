@@ -45,7 +45,7 @@
             <input type="file" class="form-control-file" name="image" value="{{ $post->image }}">
             <span class="text-small text-danger font-italic">Max image upload is 1024 kilobytes</span>
             <br>
-            <img src="{{ asset('storage/thumbnails/'.$post->thumbnail) }}" class="img-fluid" alt="thumbnail">
+            <img src="{{ $post->thumbnail == null ? asset('front/images/thumbnail_1.jpg') : asset('storage/thumbnails/'.$post->thumbnail) }}" class="img-fluid" alt="thumbnail" style="width: 200px">
         </div>
         <div class="form-group">
             <button class="btn btn-primary">Update</button>
@@ -54,7 +54,6 @@
     </form>
 
 @endsection
-
 
 @section('script')
     <script src="https://cdn.ckeditor.com/4.13.1/standard/ckeditor.js"></script>

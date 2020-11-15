@@ -14,7 +14,7 @@
                         <h4>Categories</h4>
                     </div>
                     <div class="card-body">
-                        {{ DB::table('categories')->where('users_id', auth()->id())->count() }}
+                        {{ DB::table('categories')->count() }}
                     </div>
                 </div>
             </div>
@@ -29,7 +29,11 @@
                         <h4>Posts</h4>
                     </div>
                     <div class="card-body">
-                        {{ DB::table('posts')->where('users_id', auth()->id())->count() }}
+                        @if (Gate::allows('admin-access'))
+                            {{ DB::table('posts')->count() }}                            
+                        @else                            
+                            {{ DB::table('posts')->where('users_id', auth()->id())->count() }}
+                        @endif
                     </div>
                 </div>
             </div>

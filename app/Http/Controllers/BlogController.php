@@ -19,10 +19,10 @@ class BlogController extends Controller
     public function detail($slug, Post $post)
     {
         $categories = Category::all();
-        $details = $post->where('slug', $slug)->get();
+        $detail = $post->where('slug', $slug)->first();
         $take_posts = $post->latest()->take(2)->get();
 
-        return view('layout_blog.detail', compact('details','take_posts','categories'));
+        return view('layout_blog.detail', compact('detail','take_posts','categories'));
     }
 
     public function categories(Category $category, Post $post)

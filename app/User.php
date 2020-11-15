@@ -42,4 +42,9 @@ class User extends Authenticatable
     {
         $this->attributes['email'] = strtolower($value);
     }
+
+    public function posts()
+    {
+        return $this->hasMany('App\Post');
+    }
 }

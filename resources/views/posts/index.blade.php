@@ -62,7 +62,7 @@
                         <td>{{ $result->short_description }}</td>
                         <td>{!! $result->content !!}</td>
                         <td>{{ $result->category->name }}</td>
-                        <td><img src="{{ asset('storage/thumbnails/'.$result->thumbnail) }}" class="img-fluid" alt="thumbnail"></td>
+                        <td><img src="{{ $result->thumbnail == null ? asset('front/images/thumbnail_1.jpg') : asset('storage/thumbnails/'.$result->thumbnail) }}" class="img-fluid" alt="thumbnail"></td>
                         <td>
                             <a href="{{ route('posts.edit', $result->id) }}" type="button" class="btn btn-sm btn-info"><i class="fas fa-pen"></i></a>
                             <a href="" class="btn btn-sm btn-danger" onclick="deleteData({{ $result->id }})" data-toggle="modal" data-target="#deletePostModal"><i class="fas fa-trash"></i></a>

@@ -23,8 +23,8 @@ Auth::routes();
 Route::group(['middleware' => 'auth'], function () {
     Route::prefix('cms')->group(function () {
         Route::view('dashboard', 'dashboard')->name('dashboard');
-        Route::resource('categories', 'CategoryController');
-        Route::resource('posts', 'PostController');
+        Route::resource('categories', 'CategoryController', ['except' => 'show']);
+        Route::resource('posts', 'PostController', ['except' => 'show']);
 
         Route::get('password', 'PasswordController@changePassword')->name('change.password');
         Route::patch('password', 'PasswordController@updatePassword')->name('update.password');

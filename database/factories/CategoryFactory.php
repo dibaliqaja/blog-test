@@ -10,8 +10,5 @@ $factory->define(Category::class, function (Faker $faker) {
     return [
         'name'  => $faker->unique()->sentence(1, true),
         'slug'  => Str::slug($faker->unique()->sentence(1, true)),
-        'users_id' => function () {
-            return factory(App\User::class)->create()->id;
-        },
     ];
 });

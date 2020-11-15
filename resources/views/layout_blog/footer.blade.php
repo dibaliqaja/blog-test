@@ -19,17 +19,17 @@
                 <div class="ftco-footer-widget mb-4">
                     <h2 class="ftco-heading-2">Latest Posts</h2>
                     @forelse ($take_posts as $take_post)
-                    <div class="block-21 mb-4 d-flex">
-                        <a class="img mr-4 rounded" style="background-image: url({{ asset('/storage/thumbnails/'.$take_post->thumbnail)}});"></a>
-                        <div class="text">
-                            <h3 class="heading"><a href="{{ route('blog.detail', $take_post->slug) }}">{{ $take_post->title }}</a>
-                            </h3>
-                            <div class="meta">
-                                <div><a href="{{ route('blog.detail', $take_post->slug) }}"></span> {{ $take_post->created_at->diffForHumans() }}</a></div>
-                                {{-- <div><a href="#"></span> {{ $take_post->users->name }}</a></div> --}}
+                        <div class="block-21 mb-4 d-flex">
+                            <a class="img mr-4 rounded" style="background-image: url({{ $take_post->thumbnail == null ? asset('front/images/thumbnail_1.jpg') : asset('storage/thumbnails/'.$take_post->thumbnail) }});"></a>
+                            <div class="text">
+                                <h3 class="heading"><a href="{{ route('blog.detail', $take_post->slug) }}">{{ $take_post->title }}</a>
+                                </h3>
+                                <div class="meta">
+                                    <div><a href="{{ route('blog.detail', $take_post->slug) }}"></span> {{ $take_post->created_at->diffForHumans() }}</a></div>
+                                    <div><a href="#"></span> {{ $take_post->users->name }}</a></div>
+                                </div>
                             </div>
                         </div>
-                    </div>
                     @empty
                         <p>No data found.</p>
                     @endforelse
