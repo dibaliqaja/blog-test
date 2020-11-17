@@ -2,20 +2,9 @@
 @section('title_page','Posts')
 @section('content')
 
-    @if (Session::has('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ Session('success') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
-
-    @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @foreach ($errors->all() as $error)
-                {{ $error }} <br>
-            @endforeach
+    @if (Session::has('alert'))
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ Session('alert') }}
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
@@ -65,7 +54,7 @@
                         <td><img src="{{ $result->thumbnail == null ? asset('front/images/thumbnail_1.jpg') : asset('storage/thumbnails/'.$result->thumbnail) }}" class="img-fluid" alt="thumbnail"></td>
                         <td align="center">
                             <a href="{{ route('posts.edit', $result->id) }}" type="button" class="btn btn-sm btn-info"><i class="fas fa-pen"></i></a>
-                            <a href="" class="btn btn-sm btn-danger" onclick="deleteData({{ $result->id }})" data-toggle="modal" data-target="#deletePostModal"><i class="fas fa-trash"></i></a>
+                            <a href="#" class="btn btn-sm btn-danger" onclick="deleteData({{ $result->id }})" data-toggle="modal" data-target="#deletePostModal"><i class="fas fa-trash"></i></a>
                         </td>
                     </tr>
                 @empty
@@ -76,7 +65,9 @@
             </tbody>
         </table>
     </div>
-    {{ $posts->links() }}
+    <div class="mt-3">
+        {{ $posts->links() }}
+    </div>
 
 @endsection
 

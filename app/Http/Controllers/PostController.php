@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Category;
+use App\Http\Requests\PostRequest;
 use App\Post;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\File;
@@ -18,9 +19,10 @@ class PostController extends Controller
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(Post $post)
     {
         $this->middleware('auth');
+        $this->post = $post;
     }
 
     /**
@@ -31,19 +33,27 @@ class PostController extends Controller
     public function index(Request $request)
     {
         if (Gate::allows('admin-access')) {
-            $posts = Post::latest()->paginate(10);
-            $keyword  = $request->get('keyword');
-            if ($keyword) $posts = Post::where('title', 'LIKE', "%$keyword%")->paginate(10);
+
+            $posts      = Post::latest()->paginate(10);
+            $keyword    = $request->keyword;
+            if ($keyword)
+                $posts  = Post::where('title', 'LIKE', "%$keyword%")
+                    ->latest()
+                    ->paginate(10);
 
             return view('posts.index', compact('posts'));
+
         } else if (Gate::allows('author-access')) {
-            $posts = Post::where('users_id', auth()->id())->latest()->paginate(10);
-            $keyword  = $request->get('keyword');
-            if ($keyword) {
+
+            $posts = Post::where('users_id', auth()->id())
+                ->latest()
+                ->paginate(10);
+            $keyword = $request->keyword;
+            if ($keyword)
                 $posts = Post::where('title', 'LIKE', "%$keyword%")
                     ->where('users_id', auth()->id())
+                    ->latest()
                     ->paginate(10);
-            }
 
             return view('posts.index', compact('posts'));
         }
@@ -59,6 +69,7 @@ class PostController extends Controller
     public function create()
     {
         $categories = Category::all();
+
         return view('posts.create', compact('categories'));
     }
 
@@ -68,46 +79,35 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(PostRequest $request)
     {
-        $this->validate($request, [
-            'title'             => 'required|unique:posts|min:5',
-            'short_description' => 'required|min:5',
-            'content'           => 'required',
-            'image'             => 'image|mimes:jpeg,png,jpg|max:1024',
-            'category_id'       => 'required',
-        ]);
-
         if ($request->hasFile('image')) {
             $image = $request->image;
-            $new_image = 'img-'.time().'.'.$image->getClientOriginalExtension();
-            $thumbnail = Image::make($image->getRealPath())->resize(250, 125);
-            $new_thumbnail = $thumbnail->save(public_path('storage/thumbnails/th-'.$new_image));
-            $image->move('storage/images/', $new_image);
+            $input['image_name'] = 'img-'.time().'.'.$image->getClientOriginalExtension();
 
-            Post::create([
-                'title'             => $request->title,
-                'slug'              => Str::slug($request->title)."-".Auth::id(),
-                'short_description' => $request->short_description,
-                'content'           => $request->content,
-                'image'             => $new_image,
-                'thumbnail'         => $new_thumbnail->basename,
-                'category_id'       => $request->category_id,
-                'users_id'          => Auth::id(),
-            ]);
+            $destinationPath = public_path('storage/thumbnails');
+            $img = Image::make($image->getRealPath());
+            $img->resize(200, 150, function ($constraint) {
+                $constraint->aspectRatio();
+            })->save($destinationPath.'/th-'.$input['image_name']);
 
+            $destinationPath = public_path('storage/images');
+            $image->move($destinationPath, $input['image_name']);
+
+            $validatedData              = $request->validated();
+            $validatedData['image']     = $input['image_name'];
+            $validatedData['thumbnail'] = $img->basename;
+            $validatedData['slug']      = Str::slug($request->title)."-".Auth::id();
+            $validatedData['users_id']  = Auth::id();
+            $this->post->create($validatedData);
         } else {
-            Post::create([
-                'title'             => $request->title,
-                'slug'              => Str::slug($request->title)."-".Auth::id(),
-                'short_description' => $request->short_description,
-                'content'           => $request->content,
-                'category_id'       => $request->category_id,
-                'users_id'          => Auth::id(),
-            ]);
+            $validatedData              = $request->validated();
+            $validatedData['slug']      = Str::slug($request->title)."-".Auth::id();
+            $validatedData['users_id']  = Auth::id();
+            $this->post->create($validatedData);
         }
 
-        return redirect()->route('posts.index')->with('success','Post addedd successfully.');
+        return redirect()->route('posts.index')->with('alert','Post addedd successfully.');
     }
 
     /**
@@ -118,7 +118,7 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        if (Auth::user()->id == $post->users_id || Gate::allows('admin-access')) {
+        if ($this->hasAccess($post->users_id)) {
             $categories = Category::all();
             return view('posts.edit', compact('post', 'categories'));
         }
@@ -130,47 +130,41 @@ class PostController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Post  $post
+     * @param  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Post $post)
+    public function update(PostRequest $request, $id)
     {
-        if (Auth::user()->id == $post->users_id || Gate::allows('admin-access')) {
-            $this->validate($request, [
-                'title'             => 'required|unique:posts,title,'.$post->id.'|min:5',
-                'short_description' => 'required|min:5',
-                'content'           => 'required',
-                'image'             => 'image|mimes:jpeg,png,jpg|max:1024',
-                'category_id'       => 'required',
-            ]);
-
+        $post = Post::findOrFail($id);
+        if ($this->hasAccess($post->users_id)) {
             if ($request->hasFile('image')) {
-                $image = $request->image;
-                $new_image = 'img-'.time().'.'.$image->getClientOriginalExtension();
-                $thumbnail = Image::make($image->getRealPath())->resize(250, 125);
-                $new_thumbnail = $thumbnail->save(public_path('storage/thumbnails/th-'.$new_image));
-                $image->move('storage/images/', $new_image);
+                $image_path     = public_path('storage/images/'.$post->image);
+                $thumbnail_path = public_path('storage/thumbnails/'.$post->thumbnail);
+                if(File::exists($image_path, $thumbnail_path)) File::delete($image_path, $thumbnail_path);
 
-                $post->update([
-                    'title'             => $request->title,
-                    'slug'              => Str::slug($request->title)."-".Auth::id(),
-                    'short_description' => $request->short_description,
-                    'content'           => $request->content,
-                    'image'             => $new_image,
-                    'thumbnail'         => $new_thumbnail->basename,
-                    'category_id'       => $request->category_id,
-                ]);
+                $image = $request->image;
+                $input['image_name'] = 'img-'.time().'.'.$image->getClientOriginalExtension();
+                $destinationPath = public_path('storage/thumbnails');
+                $img = Image::make($image->getRealPath());
+                $img->resize(200, 150, function ($constraint) {
+                    $constraint->aspectRatio();
+                })->save($destinationPath.'/th-'.$input['image_name']);
+
+                $destinationPath = public_path('storage/images');
+                $image->move($destinationPath, $input['image_name']);
+
+                $validatedData              = $request->validated();
+                $validatedData['image']     = $input['image_name'];
+                $validatedData['thumbnail'] = $img->basename;
+                $validatedData['slug']      = Str::slug($request->title)."-".$post->users_id;
+                $post->update($validatedData);
             } else {
-                $post->update([
-                    'title'             => $request->title,
-                    'slug'              => Str::slug($request->title)."-".Auth::id(),
-                    'short_description' => $request->short_description,
-                    'content'           => $request->content,
-                    'category_id'       => $request->category_id,
-                ]);
+                $validatedData              = $request->validated();
+                $validatedData['slug']      = Str::slug($request->title)."-".$post->users_id;
+                $post->update($validatedData);
             }
 
-            return redirect()->route('posts.index')->with('success', 'Post updated successfully.');
+            return redirect()->route('posts.index')->with('alert', 'Post updated successfully.');
         }
 
         abort(401);
@@ -184,16 +178,21 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        if (Auth::user()->id == $post->users_id || Gate::allows('admin-access')) {
+        if ($this->hasAccess($post->users_id)) {
             $image_path     = public_path('storage/images/'.$post->image);
             $thumbnail_path = public_path('storage/thumbnails/'.$post->thumbnail);
             if(File::exists($image_path, $thumbnail_path)) File::delete($image_path, $thumbnail_path);
 
             $post->delete();
 
-            return redirect()->back()->with('success','Post deleted successfully.');
+            return redirect()->back()->with('alert','Post deleted successfully.');
         }
 
         abort(401);
+    }
+
+    protected function hasAccess($id)
+    {
+        return Auth::user()->id == $id || Gate::allows('admin-access');
     }
 }
