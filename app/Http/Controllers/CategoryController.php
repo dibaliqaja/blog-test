@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Category;
-use Illuminate\Support\Str;
+use App\Http\Requests\CategoryRequest;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class CategoryController extends Controller
@@ -31,11 +30,11 @@ class CategoryController extends Controller
     public function index(Request $request)
     {
         $categories = Category::latest()->paginate(10);
-        $keyword  = $request->get('keyword');
-        if ($keyword) {
+        $keyword    = $request->keyword;
+        if ($keyword)
             $categories = Category::where('name', 'LIKE', "%$keyword%")
+                ->latest()
                 ->paginate(10);
-        }
 
         return view('categories.index', compact('categories'));
     }
@@ -53,63 +52,51 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\CategoryRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CategoryRequest $request)
     {
-        $this->validate($request, [
-            'name' => 'required|unique:categories|min:5',
-        ]);
+        $category = new Category;
+        $category->create($request->validated());
 
-        Category::create([
-            'name' => $request->name,
-            'slug' => Str::slug($request->name),
-        ]);
-
-        return redirect()->route('categories.index')->with('success', 'Category added successfully.');
+        return redirect()->route('categories.index')
+            ->with('alert', 'Category added successfully.');
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Category  $category
+     * @param  $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
         $category = Category::findOrFail($id);
+
         return view('categories.edit', compact('category'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Category  $category
+     * @param  App\Http\Requests\CategoryRequest  $request
+     * @param  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(CategoryRequest $request, $id)
     {
         $category = Category::findOrFail($id);
-        $this->validate($request, [
-            'name' => 'required|unique:categories,name,'.$id.'|min:5',
-        ]);
+        $category->update($request->validated());
 
-        $category_data = [
-            'name' => $request->name,
-            'slug' => Str::slug($request->name),
-        ];
-
-        Category::whereId($category)->update($category_data);
-
-        return redirect()->route('categories.index')->with('success','Category updated successfully.');
+        return redirect()->route('categories.index')
+            ->with('alert','Category updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Category  $category
+     * @param  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
@@ -118,9 +105,9 @@ class CategoryController extends Controller
             $category = Category::findOrFail($id);
             $category->delete();
 
-            return redirect()->back()->with('success','Category deleted successfully.');
+            return redirect()->back()->with('alert','Category deleted successfully.');
         } catch (\Illuminate\Database\QueryException $ex) {
-            return redirect()->back()->with('success','Category still used in Posts');
+            return redirect()->back()->with('alert','Category still used in Posts');
         }
     }
 }

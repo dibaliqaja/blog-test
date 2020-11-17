@@ -50,7 +50,7 @@
                     <th>Content</th>
                     <th>Category</th>
                     <th>Thumbnail</th>
-                    <th width="25%">Action</th>
+                    <th width="15%">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -60,10 +60,10 @@
                         <td>{{ $result->title }}</td>
                         <td>{{ $result->slug }}</td>
                         <td>{{ $result->short_description }}</td>
-                        <td>{!! $result->content !!}</td>
+                        <td>{!! Str::words($result->content, 10, '...') !!}</td>
                         <td>{{ $result->category->name }}</td>
                         <td><img src="{{ $result->thumbnail == null ? asset('front/images/thumbnail_1.jpg') : asset('storage/thumbnails/'.$result->thumbnail) }}" class="img-fluid" alt="thumbnail"></td>
-                        <td>
+                        <td align="center">
                             <a href="{{ route('posts.edit', $result->id) }}" type="button" class="btn btn-sm btn-info"><i class="fas fa-pen"></i></a>
                             <a href="" class="btn btn-sm btn-danger" onclick="deleteData({{ $result->id }})" data-toggle="modal" data-target="#deletePostModal"><i class="fas fa-trash"></i></a>
                         </td>

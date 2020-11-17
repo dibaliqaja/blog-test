@@ -2,20 +2,9 @@
 @section('title_page','Categories')
 @section('content')
 
-    @if (Session::has('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ Session('success') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
-
-    @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @foreach ($errors->all() as $error)
-                {{ $error }} <br>
-            @endforeach
+    @if (Session::has('alert'))
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ Session('alert') }}
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
             </button>
@@ -42,7 +31,7 @@
     <div class="table-responsive">
         <table class="table table-hover table-bordered">
             <thead>
-                <tr>
+                <tr center>
                     <th width="10%">No</th>
                     <th>Name</th>
                     <th>Slug</th>
@@ -55,9 +44,9 @@
                         <td>{{ $category + $categories->firstitem() }}</td>
                         <td>{{ $result->name }}</td>
                         <td>{{ $result->slug }}</td>
-                        <td>
+                        <td align="center">
                             <a href="{{ route('categories.edit', $result->id) }}" type="button" class="btn btn-sm btn-info"><i class="fas fa-pen"></i></a>
-                            <a href="" class="btn btn-sm btn-danger" onclick="deleteData({{ $result->id }})" data-toggle="modal" data-target="#deleteCategoryModal"><i class="fas fa-trash"></i></a>
+                            <a href="#" class="btn btn-sm btn-danger" onclick="deleteData({{ $result->id }})" data-toggle="modal" data-target="#deleteCategoryModal"><i class="fas fa-trash"></i></a>
                         </td>
                     </tr>
                 @empty
@@ -76,7 +65,7 @@
     <!-- Modal Delete -->
     <div class="modal fade" id="deleteCategoryModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
-            <form action="" id="deleteForm" method="post">
+            <form action="#" id="deleteForm" method="post">
                 @csrf
                 @method('delete')
                 <div class="modal-content">

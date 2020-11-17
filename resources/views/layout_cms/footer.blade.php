@@ -1,6 +1,6 @@
         <footer class="main-footer">
             <div class="footer-left">
-                Copyright &copy; 2020 <div class="bullet"></div> Blog Test
+                Copyright &copy; 2020 <div class="bullet"></div> Blog Test | Template by <a href="https://getstisla.com/" target="_blank">Stisla</a>
             </div>
         </footer>
     </div>
