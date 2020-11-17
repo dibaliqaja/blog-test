@@ -1,4 +1,5 @@
-@include('layout_blog.header')
+@extends('layout_blog.home')
+@section('post')
 
 <section class="hero-wrap hero-wrap-2 js-fullheight" data-stellar-background-ratio="0.5">
     <div class="overlay"></div>
@@ -63,4 +64,4 @@
     </div>
 </section> <!-- .section -->
 
-@include('layout_blog.footer')
+@endsection
