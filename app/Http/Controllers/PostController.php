@@ -88,7 +88,9 @@ class PostController extends Controller
             $img = Image::make($image->getRealPath());
             $img->resize(200, 150, function ($constraint) {
                 $constraint->aspectRatio();
-            })->save($destinationPath.'/th-'.$input['image_name']);
+            });
+            File::exists($destinationPath) or File::makeDirectory($destinationPath);
+            $img->save($destinationPath.'/th-'.$input['image_name']);
 
             $destinationPath = public_path('storage/images');
             $image->move($destinationPath, $input['image_name']);
@@ -147,7 +149,9 @@ class PostController extends Controller
                 $img = Image::make($image->getRealPath());
                 $img->resize(200, 150, function ($constraint) {
                     $constraint->aspectRatio();
-                })->save($destinationPath.'/th-'.$input['image_name']);
+                })->save();
+                File::exists($destinationPath) or File::makeDirectory($destinationPath);
+                $img->save($destinationPath.'/th-'.$input['image_name']);
 
                 $destinationPath = public_path('storage/images');
                 $image->move($destinationPath, $input['image_name']);

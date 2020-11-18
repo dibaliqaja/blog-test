@@ -19,7 +19,7 @@
             <div class="col-lg-8 ftco-animate">
 
                 <p class="mb-5">
-                    <img src="{{ $detail->image == null ? asset('front/images/image_1.jpg') : asset('storage/thumbnails/'.$detail->image) }}" class="img-fluid" style="width: 770px">
+                    <img src="{{ $detail->image == null ? asset('front/images/image_1.jpg') : asset('storage/images/'.$detail->image) }}" class="img-fluid" style="width: 770px">
                 </p>
                 <h2 class="mb-3">{{ $detail->short_description }}</h2>
 

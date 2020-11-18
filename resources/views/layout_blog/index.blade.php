@@ -36,7 +36,7 @@
             <div class="col-md-4 d-flex ftco-animate">
                 <div class="blog-entry justify-content-end">
                     <a href="{{ route('blog.detail', $post_data->slug) }}" class="block-20"
-                        style="background-image: url({{ $post_data->image == null ? asset('front/images/image_1.jpg') : asset('storage/thumbnails/'.$post_data->image) }});">
+                        style="background-image: url({{ $post_data->image == null ? asset('front/images/image_1.jpg') : asset('storage/images/'.$post_data->image) }});">
                     </a>
                     <div class="text p-4 float-right d-block">
                         <div class="topper d-flex align-items-center">
