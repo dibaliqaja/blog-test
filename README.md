@@ -79,25 +79,25 @@ DB_PASSWORD={password-database}
 ```
 9. Input client_id and client_secret for socialize sign-in, change {your-domain} with your domain and setting in the Facebook and Google API OAuth
 ```bash
-FACEBOOK_CLIENT_ID=
-FACEBOOK_CLIENT_SECRET=
-FACEBOOK_CALLBACK_URL={your-domain}/login/facebook/callback
-
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
-GOOGLE_CALLBACK_URL={your-domain}/login/google/callback
+GOOGLE_CALLBACK_URL={your-domain}/google/callback
+
+FACEBOOK_CLIENT_ID=
+FACEBOOK_CLIENT_SECRET=
+FACEBOOK_CALLBACK_URL={your-domain}/facebook/callback
 ```
 10. Migrate the database
 ```bash
 $ php artisan migrate
 ```
-11. Seed the database
-```bash
-$ php artisan db:seed
-```
-12. Create a symbolic link from public/storage to storage/app/public 
+11. Create a symbolic link from public/storage to storage/app/public 
 ```bash
 $ php artisan storage:link
+```
+12. Seed the database
+```bash
+$ php artisan db:seed
 ```
 13. Running project
 ```bash
