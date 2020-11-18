@@ -95,7 +95,11 @@ $ php artisan migrate
 ```bash
 $ php artisan db:seed
 ```
-12. Running project
+12. Create a symbolic link from public/storage to storage/app/public 
+```bash
+$ php artisan storage:link
+```
+13. Running project
 ```bash
 $ php artisan serve
 ```

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Post;
 use App\Providers\RouteServiceProvider;
 use App\User;
 use Exception;
@@ -25,6 +26,17 @@ class LoginController extends Controller
     */
 
     use AuthenticatesUsers;
+
+    /**
+     * Show the application's login form.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function showLoginForm()
+    {
+        $take_posts = Post::latest()->take(2)->get();
+        return view('auth.login', compact('take_posts'));
+    }
 
     /**
      * Where to redirect users after login.

@@ -101,7 +101,7 @@
 
                             <div class="form-group row mb-0">
                                 <div class="col-md-6 offset-md-4">
-                                    @foreach(['facebook', 'google'] as $provider)
+                                    @foreach(['google', 'facebook'] as $provider)
                                         <a class="btn text-white bg-secondary mb-2" href="{{ route('social.login', ['provider' => $provider]) }}">
                                             <i class="fab fa-{{ lcfirst($provider) }}"></i> &nbsp; Signup with {{ ucwords($provider) }}
                                         </a>

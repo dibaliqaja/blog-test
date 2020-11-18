@@ -84,7 +84,6 @@ class PostController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->image;
             $input['image_name'] = 'img-'.time().'.'.$image->getClientOriginalExtension();
-
             $destinationPath = public_path('storage/thumbnails');
             $img = Image::make($image->getRealPath());
             $img->resize(200, 150, function ($constraint) {
