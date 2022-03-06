@@ -25,11 +25,15 @@ Route::group(['middleware' => 'auth'], function () {
         Route::view('dashboard', 'dashboard')->name('dashboard');
         Route::resource('categories', 'CategoryController', ['except' => 'show']);
         Route::resource('posts', 'PostController', ['except' => 'show']);
+        Route::get('posts-download', 'PostController@downloadPost')->name('post.download');
+        Route::get('download/{post}', 'PostController@getDownloadPost')->name('post.download.data');
+        Route::post('download-multiple', 'PostController@getDownloadPostMultiple')->name('post.download.multiple');
 
         Route::get('password', 'PasswordController@changePassword')->name('change.password');
         Route::patch('password', 'PasswordController@updatePassword')->name('update.password');
     });
 });
 
+Route::post('/one-tap', 'Auth\LoginController@one_tap')->name('one_tap');
 Route::get('/{provider}', 'Auth\LoginController@redirectToProvider')->name('social.login');
 Route::get('/{provider}/callback', 'Auth\LoginController@handleProviderCallback')->name('social.callback');

@@ -5,6 +5,7 @@
     <title>Blogtest</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
 
@@ -28,6 +29,13 @@
 
 <body>
 
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    {{-- <div id="g_id_onload"
+        data-client_id="915892584672-gdkk28qtnvko1murg3gung6ihhhvelli.apps.googleusercontent.com"
+        data-context="signin"
+        data-callback="googleLoginEndpoint"
+        data-close_on_tap_outside="false">
+    </div> --}}
     <nav class="navbar px-md-0 navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
         <div class="container">
             <a class="navbar-brand" href="/">Blog<i>test</i>.</a>
@@ -138,6 +146,41 @@
             <circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00" />
         </svg>
     </div>
+
+    <script>
+        // function googleLoginEndpoint(googleUser) {
+            // console.log(googleUser);
+            // $.ajax({
+            //     headers: {
+            //         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            //     },
+            //     url: '{{ route("one_tap") }}',
+            //     type: 'POST',
+            //     data: {
+            //         id_token: googleUser.credential
+            //     },
+            //     success: function(response) {
+            //         window.location.href = response;
+            //     }
+            // });
+            // var ajax = new XMLHttpRequest();
+            // ajax.open("POST", "{{ route('one_tap') }}", true);
+            // ajax.onreadystatechange = function () {
+            //     if (this.readyState == 4) {
+            //         if (this.status == 200) {
+            //             console.log(this.responseText);
+            //         }
+            //         if (this.status == 500) {
+            //             console.log(this.responseText);
+            //         }
+            //     }
+            // };
+
+            // var formData = new FormData();
+            // formData.append("id_token", googleUser.credential);
+            // ajax.send(formData);
+        // }
+    </script>
 
 <script src="{{ asset('front/js/jquery.min.js') }}"></script>
 <script src="{{ asset('front/js/jquery-migrate-3.0.1.min.js') }}"></script>
