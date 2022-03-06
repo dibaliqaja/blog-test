@@ -25,6 +25,12 @@
                 </div>
             </form>
         </div>
+        <div class="col-md-10">
+            <input type="checkbox" name="my-article" id="my-article"><label for="my-article" class="pl-2 pt-2">Artikel Saya</label>
+        </div>
+        <div class="col-md-2">
+            <a href="{{ route('post.download') }}" class="btn btn-info">Download Post</a>
+        </div>
     </div>
     <br>
 

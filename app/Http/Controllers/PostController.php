@@ -11,6 +11,8 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use ZipArchive;
 
 class PostController extends Controller
 {
@@ -192,6 +194,56 @@ class PostController extends Controller
         }
 
         abort(401);
+    }
+
+    public function downloadPost(Request $request)
+    {
+        $posts      = Post::latest()->paginate(10);
+        $keyword    = $request->keyword;
+        if ($keyword)
+            $posts  = Post::where('title', 'LIKE', "%$keyword%")
+                ->latest()
+                ->paginate(10);
+
+        return view('posts.download', compact('posts'));
+    }
+
+    public function getDownloadPost(Post $post){
+        $txt = "$post->title \n";
+        $txt .= "\n";
+        $txt .= $post->content;
+
+        return response($txt)
+                ->withHeaders([
+                    'Content-Type' => 'text/plain',
+                    'Cache-Control' => 'no-store, no-cache',
+                    'Content-Disposition' => 'attachment; filename="'.$post->title.' '.$post->created_at->format('dmY').'.txt',
+                ]);
+    }
+
+    public function getDownloadPostMultiple(Request $request){
+        $zip      = new ZipArchive;
+        $fileName = now().'.zip';
+
+        if ($zip->open(public_path('storage/txt/' .$fileName), ZipArchive::CREATE) === TRUE) {
+            $posts = json_decode($request->data);
+            $data  = Post::whereIn('id', $posts)->get();
+            foreach ($data as $d) {
+                $txt = "$d->title \n";
+                $txt .= "\n";
+                $txt .= $d->content;
+                $relativeName = $d->title.' '.$d->created_at->format('dmY').'.txt';
+                Storage::disk('public')->put($relativeName, $txt);
+                $zip->addFile(public_path('storage/txt/'.$relativeName), $relativeName);
+            }
+            $zip->close();
+            foreach($data as $d) {
+                $relativeName = $d->title.' '.$d->created_at->format('dmY').'.txt';
+                unlink(public_path('storage/txt/'.$relativeName));
+            }
+        }
+        return response()->download(public_path('storage/txt/' .$fileName))->deleteFileAfterSend(true);
+        // return redirect('post.download')->with('alert','Successfully saved file');
     }
 
     protected function hasAccess($id)
