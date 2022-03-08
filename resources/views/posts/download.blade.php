@@ -51,7 +51,7 @@
             <tbody>
                 @forelse ($posts as $post => $result)
                     <tr>
-                        <td id="td_down">
+                        <td>
                             <input type="checkbox" name="checkbox_download" class="checkbox_download" data-id="{{ $result->id }}">
                         </td>
                         <td>{{ $post + $posts->firstitem() }}</td>
@@ -80,7 +80,8 @@
 
 @section('script')
     <script>
-        let arr = [];
+        let articles_id   = [];
+        let selected_downloads = 0;
 
         function downloadData(id) {
             var id = id;
@@ -90,89 +91,75 @@
         }
 
         $('#download-all').on('click', function() {
-            $.ajax({
-                headers: {
-                    'X-CSRF-TOKEN': `{{ csrf_token() }}`
-                },
-                url: `{{ route('post.download.multiple') }}`,
-                type: 'POST',
-                data: { data: JSON.stringify(arr) },
-                xhrFields: {
-                    responseType: 'blob'
-                },
-                success: function(response) {
-                    var blob  = new Blob([response]);
-                    var link  = document.createElement('a');
-                    link.href = window.URL.createObjectURL(blob);
-                    link.download = Date.now()+".zip";
-                    link.click();
-                    window.location.href = `{{ route('post.download') }}`;
-                }
-            });
+            if (articles_id.length == 0) {
+                alert('Download Terpilih 0');
+                return false;
+            } else {
+                $.ajax({
+                    headers: { 'X-CSRF-TOKEN': `{{ csrf_token() }}` },
+                    url: `{{ route('post.download.multiple') }}`,
+                    type: 'POST',
+                    data: { data: JSON.stringify(articles_id) },
+                    xhrFields: { responseType: 'blob' },
+                    success: function(response) {
+                        let blob  = new Blob([response]);
+                        let link  = document.createElement('a');
+                        link.href = window.URL.createObjectURL(blob);
+                        link.download = Date.now()+".zip";
+                        link.click();
+                        window.location.reload();
+                    }
+                });
+            }
         });
 
-
         $(document).ready(function(){
-            let count = 0;
             $('.checkbox_download').on('change', function () {
-                let $checkdown = $(this);
-                let $checkall  = $('#check_all');
-
-                if ($checkall.prop('checked')) {
-                    count = `{{ $posts->count() }}`;
-                    $checkall.prop("checked", false);
+                if ($('#check_all').prop('checked')) {
+                    selected_downloads = `{{ $posts->count() }}`;
+                    $('#check_all').prop("checked", false);
                 }
 
-                if ($checkdown.prop('checked')) {
-                    $checkdown.addClass('checked');
-                    arr.push($(this).data('id'));
-                    $('#download-all').text("Download Terpilih ("+ ++count +")");
+                if ($(this).prop('checked')) {
+                    $(this).addClass('checked');
+                    articles_id.push($(this).data('id'));
+                    $('#download-all').text("Download Terpilih ("+ ++selected_downloads +")");
                 } else {
-                    if ($checkall.prop("checked", false)) {
-                        if (arr.includes($(this).data('id'))) {
-                            const index = arr.indexOf($(this).data('id'));
+                    if ($('#check_all').prop("checked", false)) {
+                        if (articles_id.includes($(this).data('id'))) {
+                            const index = articles_id.indexOf($(this).data('id'));
                             if (index > -1) {
-                                arr.splice(index, 1);
+                                articles_id.splice(index, 1);
                             }
                         } else {
-                            arr.pop($(this).data('id'));
+                            articles_id.pop($(this).data('id'));
                         }
                     }
-                    $checkdown.removeClass('checked');
-                    $('#download-all').text("Download Terpilih ("+ --count +")");
+                    $(this).removeClass('checked');
+                    $('#download-all').text("Download Terpilih ("+ --selected_downloads +")");
                 }
-                console.log('array checkdown:' + arr)
+                console.log('array checkdown:' + articles_id)
             });
 
             $("#check_all").on('click', function () {
-                count = 0;
-                let d = [];
+                selected_downloads = 0;
+                let article_id = [];
                 $('.checkbox_download').prop('checked', this.checked);
-
-                // if ($('#check_all').prop("checked", true)) {
-                //     if (arr.includes($(this).data('id'))) {
-                //         const index = arr.indexOf($(this).data('id'));
-                //         if (index > -1) {
-                //             arr.splice(index, 1);
-                //         }
-                //     } else {
-                //         arr.pop($(this).data('id'));
-                //     }
-                // }
+                if ($("#check_all").prop('checked') && articles_id.length > 0) articles_id = [];
 
                 if ($('.checkbox_download').prop('checked')) {
-                    $('#download-all').text("Download Terpilih (" + {{ $posts->count() }} + ")");
                     $(".checkbox_download:checked").each(function(i) {
-                        d[i] = $(this).data('id');
-                        arr.push(d[i]);
+                        if(articles_id.includes($(this).data('id'))) articles_id = [];
+                        article_id[i] = $(this).data('id');
+                        articles_id.push(article_id[i]);
                     });
+                    $('#download-all').text("Download Terpilih (" + articles_id.length + ")");
                 } else {
-                    $('#download-all').text("Download Terpilih (0)");
-                    $(".checkbox_download:not(:checked)").each(function(i) {
-                        arr = [];
-                    });
+                    $(".checkbox_download:not(:checked)").each(() => articles_id = []);
+                    $('#download-all').text("Download Terpilih (" + articles_id.length + ")");
                 }
-                console.log('array checkall:' + arr)
+
+                console.log('array checkall:' + articles_id)
             });
 
 
