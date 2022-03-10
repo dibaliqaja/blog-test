@@ -243,7 +243,6 @@ class PostController extends Controller
             }
         }
         return response()->download(public_path('storage/txt/' .$fileName))->deleteFileAfterSend(true);
-        // return redirect('post.download')->with('alert','Successfully saved file');
     }
 
     protected function hasAccess($id)
