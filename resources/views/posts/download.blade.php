@@ -25,11 +25,11 @@
                 </div>
             </form>
         </div>
-        <div class="col-md-10">
+        <div class="col-md-8">
             <input type="checkbox" name="check_all" id="check_all"><label for="check_all" class="pl-2 pt-2">Pilih Semua ({{ $posts->count() }})</label>
         </div>
-        <div class="col-md-2">
-            <a href="#" class="btn btn-info" id="download-all">Download Terpilih (0)</a>
+        <div class="col-md-4">
+            <a href="#" class="btn btn-info float-right" id="download-all">Download Terpilih (0)</a>
         </div>
     </div>
     <br>
@@ -138,7 +138,6 @@
                     $(this).removeClass('checked');
                     $('#download-all').text("Download Terpilih ("+ --selected_downloads +")");
                 }
-                console.log('array checkdown:' + articles_id)
             });
 
             $("#check_all").on('click', function () {
@@ -158,8 +157,6 @@
                     $(".checkbox_download:not(:checked)").each(() => articles_id = []);
                     $('#download-all').text("Download Terpilih (" + articles_id.length + ")");
                 }
-
-                console.log('array checkall:' + articles_id)
             });
 
 

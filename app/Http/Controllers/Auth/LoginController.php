@@ -7,7 +7,6 @@ use App\Post;
 use App\Providers\RouteServiceProvider;
 use App\User;
 use Exception;
-use Google_Client;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Auth;
@@ -133,53 +132,6 @@ class LoginController extends Controller
             return redirect('login')->withErrors(['authentication_deny' => 'Login with '.ucfirst($provider).' failed. Please try again.']);
         }
     }
-
-    // public function one_tap()
-    // {
-    //     $google_oauth_client_id = "915892584672-gdkk28qtnvko1murg3gung6ihhhvelli.apps.googleusercontent.com";
-    //     $client = new Google_Client([ 'client_id' => $google_oauth_client_id ]);
-    //     $id_token = $_POST["id_token"];
-
-    //     $payload = $client->verifyIdToken($id_token);
-    //     if ($payload && $payload['aud'] == $google_oauth_client_id)
-    //     {
-    //         try {
-    //             $user           = new User();
-    //             $user->name     = $payload["name"];
-    //             $user->email    = $payload["email"];
-    //             $user->role     = json_encode(["AUTHOR"]);
-    //             $user->social   = [
-    //                 "google_one_tap" => [
-    //                     'id'    => $payload['sub'],
-    //                     'token' => $id_token,
-    //                 ],
-    //             ];
-
-    //             if ($user instanceof MustVerifyEmail) {
-    //                 $user->markEmailAsVerified();
-    //             }
-
-    //             $user->save();
-
-    //             return $this->socialLogin($user);
-    //         } catch (Exception $e) {
-    //             return redirect('login')->withErrors(['authentication_deny' => 'Login with google_one_tap failed. Please try again.']);
-    //         }
-
-    //         // get user information from Google
-    //         // $user_google_id = $payload['sub'];
-
-    //         // $name = $payload["name"];
-    //         // $email = $payload["email"];
-    //         // $picture = $payload["picture"];
-
-    //         // // login the user
-    //         // $_SESSION["user"] = $user_google_id;
-
-    //         // // send the response back to client side
-    //         // return "Successfully logged in. " . $user_google_id . ", " . $name . ", " . $email . ", " . $picture;
-    //     }
-    // }
 
     public function socialLogin(User $user)
     {

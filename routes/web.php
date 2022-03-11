@@ -34,6 +34,5 @@ Route::group(['middleware' => 'auth'], function () {
     });
 });
 
-Route::post('/one-tap', 'Auth\LoginController@one_tap')->name('one_tap');
 Route::get('/{provider}', 'Auth\LoginController@redirectToProvider')->name('social.login');
 Route::get('/{provider}/callback', 'Auth\LoginController@handleProviderCallback')->name('social.callback');
