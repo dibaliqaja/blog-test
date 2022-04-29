@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Category;
 use App\Post;
+use App\Rating;
 use Illuminate\Http\Request;
 
 class BlogController extends Controller
@@ -18,11 +19,27 @@ class BlogController extends Controller
 
     public function detail($slug, Post $post)
     {
-        $categories = Category::all();
-        $detail = $post->where('slug', $slug)->first();
-        $take_posts = $this->takePost($post);
+        $categories   = Category::all();
+        $detail       = $post->with('ratings')->where('slug', $slug)->first();
+        $take_posts   = $this->takePost($post);
+        $rating_count = Rating::where('posts_id', $detail->id)->count();
+        $rating_1     = Rating::where('posts_id', $detail->id)->where('star_rating', 1)->count() * 1;
+        $rating_2     = Rating::where('posts_id', $detail->id)->where('star_rating', 2)->count() * 2;
+        $rating_3     = Rating::where('posts_id', $detail->id)->where('star_rating', 3)->count() * 3;
+        $rating_4     = Rating::where('posts_id', $detail->id)->where('star_rating', 4)->count() * 4;
+        $rating_5     = Rating::where('posts_id', $detail->id)->where('star_rating', 5)->count() * 5;
+        $score_total  = $rating_5 + $rating_4 + $rating_3 + $rating_2 + $rating_1;
+        $score_total == 0 ? $response_total = 0 : $response_total = $score_total / $rating_count;
 
-        return view('layout_blog.detail', compact('detail','take_posts','categories'));
+        return view('layout_blog.detail',
+            compact(
+                'detail',
+                'take_posts',
+                'categories',
+                'rating_count',
+                'response_total'
+            )
+        );
     }
 
     public function categories(Category $category, Post $post)
@@ -43,6 +60,21 @@ class BlogController extends Controller
             : [];
 
         return view('layout_blog.index', compact('take_posts','posts_data'));
+    }
+
+
+    public function ratingPost(Request $request)
+    {
+        $validated = $this->validate($request, [
+            'posts_id'    => 'required|exists:posts,id',
+            'users_id'    => 'required|exists:users,id',
+            'comments'    => 'string',
+            'star_rating' => 'required|integer',
+        ]);
+
+        Rating::create($validated);
+
+        return redirect()->back()->with('alert','Your review has been submitted Successfully');
     }
 
     protected function takePost($post)

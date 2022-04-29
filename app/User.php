@@ -47,4 +47,9 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Post');
     }
+
+    public function ratings()
+    {
+        return $this->hasMany('App\Rating', 'users_id');
+    }
 }
