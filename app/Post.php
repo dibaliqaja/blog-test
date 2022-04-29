@@ -26,4 +26,9 @@ class Post extends Model
     {
         return $this->belongsTo('App\User');
     }
+
+    public function ratings()
+    {
+        return $this->hasMany('App\Rating', 'posts_id');
+    }
 }

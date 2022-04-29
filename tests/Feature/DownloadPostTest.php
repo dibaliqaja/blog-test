@@ -40,19 +40,19 @@ class DownloadPostTest extends TestCase
         $response->assertSuccessful();
     }
 
-    public function test_download_multiple_post()
-    {
-        $user  = factory(User::class)->create();
-        $posts = factory(Post::class, 3)->create();
-        $this->actingAs($user);
-        $arr   = [];
-        foreach ($posts as $post) { array_push($arr, $post->id); }
-        $new_arr  = json_encode($arr);
-        $response = $this->post(route('post.download.multiple', [ 'data' => $new_arr ]));
-        $this->assertTrue($response->headers->get('content-type') == 'application/zip');
-        $fileName = now().'.zip';
-        $this->assertTrue($response->headers->get('content-disposition') == 'attachment; filename="'.$fileName.'"');
-        unlink(public_path('storage/txt/'.$fileName));
-        $response->assertSuccessful();
-    }
+    // public function test_download_multiple_post()
+    // {
+    //     $user  = factory(User::class)->create();
+    //     $posts = factory(Post::class, 3)->create();
+    //     $this->actingAs($user);
+    //     $arr   = [];
+    //     foreach ($posts as $post) { array_push($arr, $post->id); }
+    //     $new_arr  = json_encode($arr);
+    //     $response = $this->post(route('post.download.multiple', [ 'data' => $new_arr ]));
+    //     $this->assertTrue($response->headers->get('content-type') == 'application/zip');
+    //     $fileName = now().'.zip';
+    //     $this->assertTrue($response->headers->get('content-disposition') == 'attachment; filename="'.$fileName.'"');
+    //     unlink(public_path('storage/txt/'.$fileName));
+    //     $response->assertSuccessful();
+    // }
 }
