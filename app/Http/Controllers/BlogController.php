@@ -56,7 +56,11 @@ class BlogController extends Controller
         $take_posts = $this->takePost($post);
         $keyword    = $request->search;
         $posts_data = ($keyword)
-            ? $post->where('title', 'LIKE', "%$keyword%")->latest()->paginate(5)
+            ? $post->where('title', 'LIKE', "%$keyword%")
+                   ->orWhere('short_description', 'LIKE', "%$keyword%")
+                   ->orWhere('content', 'LIKE', "%$keyword%")
+                   ->latest()
+                   ->paginate(5)
             : [];
 
         return view('layout_blog.index', compact('take_posts','posts_data'));
@@ -65,14 +69,18 @@ class BlogController extends Controller
 
     public function ratingPost(Request $request)
     {
-        $validated = $this->validate($request, [
+        $this->validate($request, [
             'posts_id'    => 'required|exists:posts,id',
             'users_id'    => 'required|exists:users,id',
-            'comments'    => 'string',
             'star_rating' => 'required|integer',
         ]);
 
-        Rating::create($validated);
+        Rating::create([
+            'posts_id'    => $request->posts_id,
+            'users_id'    => $request->users_id,
+            'comments'    => $request->comments,
+            'star_rating' => $request->star_rating
+        ]);
 
         return redirect()->back()->with('alert','Your review has been submitted Successfully');
     }
