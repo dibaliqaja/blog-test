@@ -19,6 +19,11 @@
                     <i class="fas fa-list-alt"></i><span>Categories</span>
                 </a>
             </li>
+            <li class="{{ (request()->routeIs('tags*')) ? 'active' : '' }}">
+                <a href="{{ route('tags.index') }}" class="nav-link">
+                    <i class="fas fa-tags"></i><span>Tags</span>
+                </a>
+            </li>
             <li class="{{ (request()->routeIs('posts*')) ? 'active' : '' }}">
                 <a href="{{ route('posts.index') }}" class="nav-link">
                     <i class="fas fa-file-signature"></i><span>Post</span>

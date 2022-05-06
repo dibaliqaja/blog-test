@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Support\Str;
 use Illuminate\Foundation\Http\FormRequest;
 
-class PostRequest extends FormRequest
+class TagRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,21 +25,15 @@ class PostRequest extends FormRequest
     public function rules()
     {
         return [
-            'title'             => 'required|string|unique:posts,title,'.$this->post.'|min:5',
-            'slug'              => 'required|string|unique:posts,slug,'.$this->post,
-            'short_description' => 'required|min:5',
-            'content'           => 'required',
-            'image'             => 'image|mimes:jpeg,png,jpg|max:1024',
-            'thumbnail'         => 'image|mimes:jpeg,png,jpg',
-            'category_id'       => 'exists:categories,id|required',
-            'tags'              => 'exists:tags,id|required',
+            'name' => 'required|string|unique:tags,name,'.$this->tag.'|min:2',
+            'slug' => 'required|string|unique:tags,slug,'.$this->tag,
         ];
     }
 
     protected function getValidatorInstance()
     {
         $data = $this->all();
-        $data['slug'] = Str::slug($data['title']);
+        $data['slug'] = Str::slug($data['name']);
         $this->getInputSource()->replace($data);
 
         return parent::getValidatorInstance();

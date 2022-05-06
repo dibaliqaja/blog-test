@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Category;
 use App\Http\Requests\PostRequest;
 use App\Post;
+use App\Tag;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -70,9 +71,10 @@ class PostController extends Controller
      */
     public function create()
     {
+        $tags       = Tag::all();
         $categories = Category::all();
 
-        return view('posts.create', compact('categories'));
+        return view('posts.create', compact('tags', 'categories'));
     }
 
     /**
@@ -102,12 +104,14 @@ class PostController extends Controller
             $validatedData['thumbnail'] = $img->basename;
             $validatedData['slug']      = Str::slug($request->title)."-".Auth::id();
             $validatedData['users_id']  = Auth::id();
-            $this->post->create($validatedData);
+            $post = $this->post->create($validatedData);
+            $post->tags()->attach($request->tags);
         } else {
             $validatedData              = $request->validated();
             $validatedData['slug']      = Str::slug($request->title)."-".Auth::id();
             $validatedData['users_id']  = Auth::id();
-            $this->post->create($validatedData);
+            $post = $this->post->create($validatedData);
+            $post->tags()->attach($request->tags);
         }
 
         return redirect()->route('posts.index')->with('alert','Post addedd successfully.');
@@ -122,8 +126,9 @@ class PostController extends Controller
     public function edit(Post $post)
     {
         if ($this->hasAccess($post->users_id)) {
+            $tags       = Tag::all();
             $categories = Category::all();
-            return view('posts.edit', compact('post', 'categories'));
+            return view('posts.edit', compact('post', 'categories', 'tags'));
         }
 
         abort(401);
@@ -162,10 +167,12 @@ class PostController extends Controller
                 $validatedData['image']     = $input['image_name'];
                 $validatedData['thumbnail'] = $img->basename;
                 $validatedData['slug']      = Str::slug($request->title)."-".$post->users_id;
+                $post->tags()->sync($request->tags);
                 $post->update($validatedData);
             } else {
                 $validatedData              = $request->validated();
                 $validatedData['slug']      = Str::slug($request->title)."-".$post->users_id;
+                $post->tags()->sync($request->tags);
                 $post->update($validatedData);
             }
 
