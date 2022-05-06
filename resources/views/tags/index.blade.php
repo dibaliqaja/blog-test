@@ -1,5 +1,5 @@
 @extends('layout_cms.home')
-@section('title_page','Posts')
+@section('title_page','Tags')
 @section('content')
 
     @if (Session::has('alert'))
@@ -13,20 +13,17 @@
 
     <div class="row">
         <div class="col-md-8">
-            <a href="{{ route('posts.create') }}" class="btn btn-primary">Add Post</a><br><br>
+            <a href="{{ route('tags.create') }}" class="btn btn-primary">Add Tag</a><br><br>
         </div>
         <div class="col-md-4">
             <form action="#" class="flex-sm">
                 <div class="input-group">
-                    <input type="text" name="keyword" class="form-control" placeholder="Search by title" value="{{ Request::get('keyword') }}">
+                    <input type="text" name="keyword" class="form-control" placeholder="Search by name" value="{{ Request::get('keyword') }}">
                     <div class="input-group-append">
                         <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
                     </div>
                 </div>
             </form>
-        </div>
-        <div class="col-md-12">
-            <a href="{{ route('post.download') }}" class="btn btn-info float-right">Download Post</a>
         </div>
     </div>
     <br>
@@ -34,64 +31,48 @@
     <div class="table-responsive">
         <table class="table table-hover table-bordered">
             <thead>
-                <tr>
+                <tr center>
                     <th width="10%">No</th>
-                    <th>Title</th>
+                    <th>Name</th>
                     <th>Slug</th>
-                    <th>Short Desc</th>
-                    <th>Content</th>
-                    <th>Category</th>
-                    <th>Tags</th>
-                    <th>Thumbnail</th>
                     <th width="15%">Action</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse ($posts as $post => $result)
+                @forelse ($tags as $tag => $result)
                     <tr>
-                        <td>{{ $post + $posts->firstitem() }}</td>
-                        <td>{{ $result->title }}</td>
+                        <td>{{ $tag + $tags->firstitem() }}</td>
+                        <td>{{ $result->name }}</td>
                         <td>{{ $result->slug }}</td>
-                        <td>{{ $result->short_description }}</td>
-                        <td>{!! Str::words($result->content, 10, '...') !!}</td>
-                        <td>{{ $result->category->name }}</td>
-                        <td>
-                            @foreach ($result->tags as $tag)
-                                <ul>
-                                    <li>{{ $tag->name }}</li>
-                                </ul>
-                            @endforeach
-                        </td>
-                        <td><img src="{{ $result->thumbnail == null ? asset('front/images/thumbnail_1.jpg') : asset('storage/thumbnails/'.$result->thumbnail) }}" class="img-fluid" alt="thumbnail"></td>
                         <td align="center">
-                            <a href="{{ route('posts.edit', $result->id) }}" type="button" class="btn btn-sm btn-info"><i class="fas fa-pen"></i></a>
-                            <a href="#" class="btn btn-sm btn-danger" onclick="deleteData({{ $result->id }})" data-toggle="modal" data-target="#deletePostModal"><i class="fas fa-trash"></i></a>
+                            <a href="{{ route('tags.edit', $result->id) }}" type="button" class="btn btn-sm btn-info"><i class="fas fa-pen"></i></a>
+                            <a href="#" class="btn btn-sm btn-danger" onclick="deleteData({{ $result->id }})" data-toggle="modal" data-target="#deleteTagModal"><i class="fas fa-trash"></i></a>
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8">No data found.</td>
+                        <td colspan="4">No data found.</td>
                     </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
     <div class="mt-3">
-        {{ $posts->links() }}
+        {{ $tags->links() }}
     </div>
 
 @endsection
 
 @section('modal')
     <!-- Modal Delete -->
-    <div class="modal fade" id="deletePostModal" tabindex="-1" role="dialog">
+    <div class="modal fade" id="deleteTagModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
-            <form action="" id="deleteForm" method="post">
+            <form action="#" id="deleteForm" method="post">
                 @csrf
                 @method('delete')
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title" id="vcenter">Delete Post</h4>
+                        <h4 class="modal-title" id="vcenter">Delete Tag</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -113,7 +94,7 @@
     <script>
         function deleteData(id) {
             var id = id;
-            var url = '{{ route("posts.destroy", ":id") }}';
+            var url = '{{ route("tags.destroy", ":id") }}';
             url = url.replace(':id', id);
             $("#deleteForm").attr('action', url);
         }

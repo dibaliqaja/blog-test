@@ -57,6 +57,20 @@
             @enderror
         </div>
         <div class="form-group">
+            <label for="tags">Tag</label>
+            <select class="form-control select2 @error('tags') is-invalid @enderror" multiple="" name="tags[]" id="tag_id">
+                @foreach ($tags as $tag)
+                    <option value="{{ $tag->id }}">{{ $tag->name }}</option>
+                @endforeach
+            </select>
+
+            @error('tags')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
+        </div>
+        <div class="form-group">
             <label for="image">Image</label>
             <input type="file" class="form-control-file @error('image') is-invalid @enderror" name="image">
             <span class="text-small text-danger font-italic">Max image upload is 1024 kilobytes</span>

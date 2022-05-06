@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Category;
 use App\Post;
 use App\Rating;
+use App\Tag;
 use Illuminate\Http\Request;
 
 class BlogController extends Controller
@@ -20,6 +21,7 @@ class BlogController extends Controller
     public function detail($slug, Post $post)
     {
         $categories   = Category::all();
+        $tags         = Tag::all();
         $detail       = $post->with('ratings')->where('slug', $slug)->first();
         $take_posts   = $this->takePost($post);
         $rating_count = Rating::where('posts_id', $detail->id)->count();
@@ -36,6 +38,7 @@ class BlogController extends Controller
                 'detail',
                 'take_posts',
                 'categories',
+                'tags',
                 'rating_count',
                 'response_total'
             )

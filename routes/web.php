@@ -23,11 +23,12 @@ Auth::routes();
 Route::group(['middleware' => 'auth'], function () {
 
     Route::post('rating', 'BlogController@ratingPost')->name('rating.store');
-    
+
     Route::prefix('cms')->group(function () {
         Route::view('dashboard', 'dashboard')->name('dashboard');
 
         Route::resource('categories', 'CategoryController', ['except' => 'show']);
+        Route::resource('tags', 'TagController', ['except' => 'show']);
         Route::resource('posts', 'PostController', ['except' => 'show']);
 
         Route::get('posts-download', 'PostController@downloadPost')->name('post.download');

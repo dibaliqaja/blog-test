@@ -27,12 +27,20 @@
                     <img src="{{ $detail->image == null ? asset('front/images/image_1.jpg') : asset('storage/images/'.$detail->image) }}" class="img-fluid" style="width: 770px">
                 </p>
                 <h2 class="mb-3">{{ $detail->short_description }}</h2>
+                <p>
+                <h6>
+                    <a href="{{ route('blog.categories', $detail->category->slug) }}">
+                        {{ $detail->category->name }}
+                    </a>
+                </h6>
 
                 <p>{!! $detail->content !!}</p>
 
                 <div class="tag-widget post-tag-container mb-5 mt-5">
                     <div class="tagcloud">
-                        <a class="tag-cloud-link">{{ $detail->category->name }}</a>
+                        @foreach ($detail->tags as $tag)
+                            <a class="tag-cloud-link">{{ $tag->name }}</a>
+                        @endforeach
                     </div>
                 </div>
 
@@ -130,6 +138,14 @@
                         @foreach ($categories as $category)
                         <li><a href="{{ route('blog.categories', $category->slug) }}">{{ $category->name }} <span
                                     class="ion-ios-arrow-forward"></span></a></li>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="sidebar-box ftco-animate">
+                    <h3>Tags</h3>
+                    <div class="tagcloud">
+                        @foreach ($tags as $tag)
+                            <a class="tag-cloud-link">{{ $tag->name }}</a>
                         @endforeach
                     </div>
                 </div>
