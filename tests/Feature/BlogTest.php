@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Category;
 use App\Post;
+use App\Tag;
 use App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -35,13 +36,18 @@ class BlogTest extends TestCase
     public function test_guest_can_visit_detail_post_blog()
     {
         $category = factory(Category::class)->create();
+        $tags     = factory(Tag::class, 2)->create();
         $post     = factory(Post::class)->create(['category_id' => $category->id]);
+        $post->tags()->attach($tags);
         $response = $this->get(route('blog.detail', $post->slug));
         $response->assertStatus(200);
         $response->assertSeeText($post->title);
         $response->assertSeeText($post->short_description);
         $response->assertSeeText($post->content);
         $response->assertSeeText($category->name);
+        $response->assertSeeText($post->category->name);
+        $response->assertSeeText($post->tags[1]->name);
+        $response->assertSeeText($post->tags[1]->name);
         $response->assertSee('article-header--rating');
         $response->assertSee('article-header--rating-star');
         $response->assertSee('article-header--rating-rate');
@@ -51,6 +57,7 @@ class BlogTest extends TestCase
         $response->assertSee('comment-form-wrap pt-5');
         $response->assertSee('search-form');
         $response->assertSee('Categories');
+        $response->assertSee('Tags');
     }
 
     public function test_guest_can_view_categories_list_in_detail_post()
@@ -61,6 +68,18 @@ class BlogTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Categories');
         $response->assertSee($category->name);
+    }
+
+    public function test_guest_can_view_tags_list_in_detail_post()
+    {
+        $category = factory(Category::class)->create();
+        $tags     = factory(Tag::class, 2)->create();
+        $post     = factory(Post::class)->create(['category_id' => $category->id]);
+        $response = $this->get(route('blog.detail', $post->slug));
+        $response->assertStatus(200);
+        $response->assertSee('Tags');
+        $response->assertSee($tags[0]->name);
+        $response->assertSee($tags[1]->name);
     }
 
     public function test_guest_can_visit_post_by_categories()
