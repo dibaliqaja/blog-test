@@ -141,6 +141,40 @@
         </svg>
     </div>
 
+@if (!Auth::check())
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <div id="g_id_onload"
+        data-client_id="{{ env('GOOGLE_CLIENT_ID') }}"
+        data-context="signin"
+        data-callback="googleLoginEndpoint"
+        data-close_on_tap_outside="false">
+    </div>
+
+@endif
+
+<script>
+    function googleLoginEndpoint(googleUser) {
+        let ajax = new XMLHttpRequest();
+        ajax.open("POST", "{{ route('tapin.login') }}", true);
+        ajax.setRequestHeader("X-CSRF-TOKEN", "{{ csrf_token() }}")
+        ajax.onreadystatechange = function () {
+            if (this.readyState == 4) {
+                if (this.status == 200) {
+                    window.location = this.responseURL
+                }
+                if (this.status == 500) {
+                    console.log(this.responseText);
+                }
+            }
+        };
+
+        let formData = new FormData();
+        formData.append("id_token", googleUser.credential);
+        ajax.send(formData);
+    }
+</script>
+
 <script src="{{ asset('front/js/jquery.min.js') }}"></script>
 <script src="{{ asset('front/js/jquery-migrate-3.0.1.min.js') }}"></script>
 <script src="{{ asset('front/js/popper.min.js') }}"></script>
