@@ -40,5 +40,6 @@ Route::group(['middleware' => 'auth'], function () {
     });
 });
 
+Route::post('/tap-in', 'Auth\LoginController@tapinLogin')->name('tapin.login');
 Route::get('/{provider}', 'Auth\LoginController@redirectToProvider')->name('social.login');
 Route::get('/{provider}/callback', 'Auth\LoginController@handleProviderCallback')->name('social.callback');

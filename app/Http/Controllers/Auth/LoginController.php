@@ -7,6 +7,7 @@ use App\Post;
 use App\Providers\RouteServiceProvider;
 use App\User;
 use Exception;
+use Google_Client;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Support\Facades\Auth;
@@ -138,5 +139,45 @@ class LoginController extends Controller
         Auth::loginUsingId($user->id);
 
         return redirect($this->redirectTo);
+    }
+
+    public function tapinLogin()
+    {
+        $google_oauth_client_id = env('GOOGLE_CLIENT_ID');
+        $client   = new Google_Client(['client_id' => $google_oauth_client_id]);
+        $id_token = $_POST["id_token"];
+        $payload  = $client->verifyIdToken($id_token);
+
+        if ($payload && $payload['aud'] == $google_oauth_client_id) {
+            $google_id = $payload['sub'];
+            $name      = $payload["name"];
+            $email     = $payload["email"];
+            $token     = $payload["jti"];
+
+            $user = User::where(['email' => $email])->first();
+            if (!$user) {
+                $user           = new User;
+                $user->name     = $name;
+                $user->email    = $email;
+                $user->role     = json_encode(["AUTHOR"]);
+                $user->social   = [
+                    "google" => [
+                        'id'    => $google_id,
+                        'token' => $token,
+                    ],
+                ];
+
+                if ($user instanceof MustVerifyEmail) {
+                    $user->markEmailAsVerified();
+                }
+
+                $user->save();
+            }
+            Auth::loginUsingId($user->id);
+            return redirect()->back();
+        } else {
+            // token is not verified or expired
+            echo "Login Failed!";
+        }
     }
 }
